@@ -2,7 +2,7 @@
 	heap
 	This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
+
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -23,7 +23,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: vec![T::default()], // 0th index is unused
             comparator,
         }
     }
@@ -37,7 +37,22 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        self.items.push(value);
+        self.count += 1;
+        self.bubble_up(self.count);
+    }
+
+    fn bubble_up(&mut self, idx: usize) {
+        let mut idx = idx;
+        while idx > 1 {
+            let parent_idx = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[parent_idx]) {
+                self.items.swap(idx, parent_idx);
+                idx = parent_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +72,41 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+
+        if right > self.count {
+            return left; // Only left child exists
+        }
+
+        if (self.comparator)(&self.items[left], &self.items[right]) {
+            left
+        } else {
+            right
+        }
+    }
+
+    fn bubble_down(&mut self, idx: usize) {
+        let mut idx = idx;
+        while self.children_present(idx) {
+            let smaller_child_idx = self.smallest_child_idx(idx);
+            if (self.comparator)(&self.items[smaller_child_idx], &self.items[idx]) {
+                self.items.swap(idx, smaller_child_idx);
+                idx = smaller_child_idx;
+            } else {
+                break;
+            }
+        }
+    }
+
+    pub fn pop(&mut self) -> Option<T> {
+        if self.is_empty() {
+            return None;
+        }
+        let result = self.items.swap_remove(1);
+        self.count -= 1;
+        self.bubble_down(1);
+        Some(result)
     }
 }
 
@@ -66,12 +114,10 @@ impl<T> Heap<T>
 where
     T: Default + Ord,
 {
-    /// Create a new MinHeap
     pub fn new_min() -> Self {
         Self::new(|a, b| a < b)
     }
 
-    /// Create a new MaxHeap
     pub fn new_max() -> Self {
         Self::new(|a, b| a > b)
     }
@@ -84,8 +130,7 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        self.pop()
     }
 }
 
@@ -116,10 +161,11 @@ impl MaxHeap {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_empty_heap() {
         let mut heap = MaxHeap::new::<i32>();
-        assert_eq!(heap.next(), None);
+        assert_eq!(heap.pop(), None);
     }
 
     #[test]
@@ -130,11 +176,11 @@ mod tests {
         heap.add(9);
         heap.add(11);
         assert_eq!(heap.len(), 4);
-        assert_eq!(heap.next(), Some(2));
-        assert_eq!(heap.next(), Some(4));
-        assert_eq!(heap.next(), Some(9));
+        assert_eq!(heap.pop(), Some(2));
+        assert_eq!(heap.pop(), Some(4));
+        assert_eq!(heap.pop(), Some(9));
         heap.add(1);
-        assert_eq!(heap.next(), Some(1));
+        assert_eq!(heap.pop(), Some(1));
     }
 
     #[test]
@@ -145,10 +191,10 @@ mod tests {
         heap.add(9);
         heap.add(11);
         assert_eq!(heap.len(), 4);
-        assert_eq!(heap.next(), Some(11));
-        assert_eq!(heap.next(), Some(9));
-        assert_eq!(heap.next(), Some(4));
+        assert_eq!(heap.pop(), Some(11));
+        assert_eq!(heap.pop(), Some(9));
+        assert_eq!(heap.pop(), Some(4));
         heap.add(1);
-        assert_eq!(heap.next(), Some(2));
+        assert_eq!(heap.pop(), Some(2));
     }
 }
