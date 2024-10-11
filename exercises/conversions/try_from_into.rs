@@ -9,7 +9,7 @@
 // Execute `rustlings hint try_from_into` or use the `hint` watch subcommand for
 // a hint.
 
-use std::convert::{TryFrom, TryInto};
+use std::{convert::{TryFrom, TryInto}, hash::BuildHasherDefault};
 
 #[derive(Debug, PartialEq)]
 struct Color {
@@ -27,7 +27,7 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
+
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -41,6 +41,16 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        let(red, green, blue) = tuple;
+        if(0..=255).contains(&red) && (0..=255).contains(&green) && (0..=255).contains(&blue){
+            Ok(Color{
+                red: red as u8,
+                green: green as u8,
+                blue: blue as u8,
+            })
+        }else{
+            Err(IntoColorError::IntConversion)
+        }
     }
 }
 
@@ -48,6 +58,19 @@ impl TryFrom<(i16, i16, i16)> for Color {
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        if arr.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        let (red, green, blue) = (arr[0], arr[1], arr[2]);
+        if(0..=255).contains(&red) && (0..=255).contains(&green) && (0..=255).contains(&blue){
+            Ok(Color{
+                red: red as u8,
+                green: green as u8,
+                blue: blue as u8,
+            })
+        }else{
+            Err(IntoColorError::IntConversion)
+        }
     }
 }
 
@@ -55,6 +78,19 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            return Err(IntoColorError::BadLen);
+        }
+        let (red, green, blue) = (slice[0], slice[1], slice[2]);
+        if(0..=255).contains(&red) && (0..=255).contains(&green) && (0..=255).contains(&blue){
+            Ok(Color{
+                red: red as u8,
+                green: green as u8,
+                blue: blue as u8,
+            })
+        }else{
+            Err(IntoColorError::IntConversion)
+        }
     }
 }
 
