@@ -8,9 +8,10 @@
 #[allow(unused_variables, unused_assignments)]
 fn main() {
     let my_option: Option<()> = None;
-    if my_option.is_none() {
-        panic!();
-    }
+    match my_option {  
+        Some(_) => println!("Option has a value"),  
+        None => println!("Option was None"),  
+    }  
 
     let my_arr = &[
         -1, -2, -3,
